@@ -46,8 +46,8 @@ class Feedback{
                 array_push($feedbacks,$feedback);
                 $filename = $this->feedbackFile->filename;
                 if ($this->feedbackFile->putProcessedFileContent($filename,$feedbacks)) {
-                    $this->helpers->flash('success', 'You have successfully store the feedback');
-                    header('Location: dashboard.php');
+                    $this->helpers->flash('success', 'You have successfully stored the feedback');
+                    header('Location: feedback-success.php');
                     exit;
                 }else{
                     $this->errors['feedback_error'] = 'A feedback error occured. Please try again';
@@ -72,7 +72,7 @@ $fdback->storeFeedback();
 <header class="bg-white">
     <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div class="flex lg:flex-1">
-            <a href="./index.html" class="-m-1.5 p-1.5">
+            <a href="index.php" class="-m-1.5 p-1.5">
                 <span class="sr-only">TruthWhisper</span>
                 <span class="block font-bold text-lg bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</span>
             </a>
@@ -84,7 +84,7 @@ $fdback->storeFeedback();
         <div class="fixed inset-0 z-10"></div>
         <div class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div class="flex items-center justify-between">
-                <a href="./index.html" class="-m-1.5 p-1.5">
+                <a href="index.php" class="-m-1.5 p-1.5">
                     <span class="sr-only">TruthWhisper</span>
                     <span class="block font-bold text-xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</span>
                 </a>
