@@ -1,3 +1,65 @@
+<?php
+
+require 'feedbackFile.php';
+require 'file.php';
+require 'helpers.php';
+
+class Feedback{
+    //Input
+    public $feedback;
+    // Error Bag
+    protected $errors;
+    //Helpers
+    protected $helpers;
+    //FeedbackFile
+    protected $feedbackFile;
+
+    public function __construct($helpers, $errors , $feedbackFile){
+        $this->helpers      = $helpers;
+        $this->errors       = $errors;
+        $this->feedbackFile = $feedbackFile;
+    }
+
+    public function storeFeedback(){
+        //Store the link and feedback in file
+        //Input Data
+        $this->feedback = '';
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            //Get the Link from the hidden input field
+            $link = isset($_POST['link']) ? $_POST['link'] : '';
+            // Handle Any Errors That Occur
+            // Sanitize the Feedback Field
+            if(empty($_POST['feedback'])){
+                $this->errors['feedback'] = 'Please provide the feedback';
+            }else{
+                $this->feedback = $this->helpers->sanitize($_POST['feedback']);
+            }
+            //Store the Feedback
+            if (empty($this->errors)) {
+                //Prepare the Data
+                $feedback = [
+                    'link'      => $link,
+                    'feedback'  => $this->feedback
+                ];
+                //Store the Feedback in Feedbacks File
+                $feedbacks = $this->feedbackFile->getFeedbacks();
+                array_push($feedbacks,$feedback);
+                $filename = $this->feedbackFile->filename;
+                if ($this->feedbackFile->putProcessedFileContent($filename,$feedbacks)) {
+                    $this->helpers->flash('success', 'You have successfully store the feedback');
+                    header('Location: dashboard.php');
+                    exit;
+                }else{
+                    $this->errors['feedback_error'] = 'A feedback error occured. Please try again';
+                }
+            }
+        }
+    }
+}
+$fdback = new Feedback(new Helpers(),[],new FeedbackFile(new File()));
+$fdback->storeFeedback();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,11 +108,12 @@
                 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                     <div class="mx-auto w-full max-w-xl text-center">
                         <h1 class="block text-center font-bold text-2xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</h1>
-                        <h3 class="text-gray-500 my-2">Want to ask something or share a feedback to "John Doe"?</h3>
+                        <h3 class="text-gray-500 my-2">Want to ask something or share a feedback ?</h3>
                     </div>
 
                     <div class="mt-10 mx-auto w-full max-w-xl">
-                        <form class="space-y-6" action="#" method="POST">
+                        <form class="space-y-6" action="feedback.php" method="POST">
+                            <input type="hidden" name="link" value="<?php echo htmlspecialchars($_GET['link']) ?>">
                             <div>
                                 <label for="feedback" class="block text-sm font-medium leading-6 text-gray-900">Don't hesitate, just do it!</label>
                                 <div class="mt-2">

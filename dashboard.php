@@ -1,3 +1,48 @@
+<?php
+session_start();
+
+require 'feedbackFile.php';
+require 'file.php';
+
+class Dashboard{
+    protected $feedbackFile;
+    public $feedbacks;
+
+    public function __construct($feedbackFile){
+        $this->feedbackFile = $feedbackFile;
+        $this->feedbacks = $this->getAllFeedbacks();
+    }
+
+    public function getAllFeedbacks(){
+        return $this->feedbackFile->getFeedbacks();
+    }
+
+    public function checkLogin(){
+        // // Check if the user is not logged in
+        if (!isset($_SESSION['user_id']) && !isset($_SESSION['username'])) {
+            header("Location: login.php");
+            exit;
+        }
+    }
+
+    public function generateUniqueLink(){
+        $uniqueLink = bin2hex(random_bytes(16));
+        return $uniqueLink;
+    }
+
+    public function getCurrentDirUrl(){
+        $protocol       = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
+        $host           = $_SERVER['HTTP_HOST'];
+        $requestURI     = $_SERVER['REQUEST_URI'];
+        $dirURI         = dirname($requestURI);
+        $directoryUrl   = $protocol . '://' . $host . $dirURI . '/';
+        return $directoryUrl;
+    }
+}
+$dashboard = new Dashboard(new FeedbackFile(new File()));
+$dashboard->checkLogin();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +55,7 @@
 <header class="bg-white">
     <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div class="flex lg:flex-1">
-            <a href="./index.html" class="-m-1.5 p-1.5">
+            <a href="index.php" class="-m-1.5 p-1.5">
                 <span class="sr-only">TruthWhisper</span>
                 <span class="block font-bold text-lg bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</span>
             </a>
@@ -24,7 +69,11 @@
             </button>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-            <span class="text-sm font-semibold leading-6 text-gray-900">John Doe</span>
+            <!-- <span class="text-sm font-semibold leading-6 text-gray-900">John Doe</span> -->
+            <a href="logout.php" class="-m-1.5 p-1.5">
+                <span class="sr-only">Logout</span>
+                <span class="block font-bold text-lg bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">Logout</span>
+            </a>
         </div>
     </nav>
     <!-- Mobile menu, show/hide based on menu open state. -->
@@ -33,7 +82,7 @@
         <div class="fixed inset-0 z-10"></div>
         <div class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div class="flex items-center justify-between">
-                <a href="./index.html" class="-m-1.5 p-1.5">
+                <a href="index.php" class="-m-1.5 p-1.5">
                     <span class="sr-only">TruthWhisper</span>
                     <span class="block font-bold text-xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</span>
                 </a>
@@ -62,33 +111,21 @@
 
         <div class="relative max-w-7xl mx-auto">
             <div class="flex justify-end">
-                <span class="block text-gray-600 font-mono border border-gray-400 rounded-xl px-2 py-1">Your feedback form link: <strong>http://localhost/feedback/sYu24jl</strong></span>
+                <span class="block text-gray-600 font-mono border border-gray-400 rounded-xl px-2 py-1">Your feedback form link: <strong><a href="<?php echo $dashboard->getCurrentDirUrl() ?>feedback.php?link=<?php echo $dashboard->generateUniqueLink() ?>"><?php echo $dashboard->getCurrentDirUrl() ?>feedback.php</a></strong></span>
             </div>
             <h1 class="text-xl text-indigo-800 text-bold my-10">Received feedback</h1>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
-                    <div class="focus:outline-none">
-                        <p class="text-gray-500">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
-                    <div class="focus:outline-none">
-                        <p class="text-gray-500">But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness.</p>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
-                    <div class="focus:outline-none">
-                        <p class="text-gray-500">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. </p>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
-                    <div class="focus:outline-none">
-                        <p class="text-gray-500">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </div>
+                <?php 
+                    foreach ($dashboard->feedbacks as $feedback) {
+                        ?>
+                            <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+                                <div class="focus:outline-none">
+                                    <p class="text-gray-500"><?php echo $feedback['feedback'] ?></p>
+                                </div>
+                            </div>
+                        <?php
+                    }
+                ?>
             </div>
         </div>
 

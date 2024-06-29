@@ -1,3 +1,7 @@
+<?php
+session_start();//Start the Session
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +14,7 @@
 <header class="bg-white">
     <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div class="flex lg:flex-1">
-            <a href="./index.html" class="-m-1.5 p-1.5">
+            <a href="index.php" class="-m-1.5 p-1.5">
                 <span class="sr-only">TruthWhisper</span>
                 <span class="block font-bold text-lg bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</span>
             </a>
@@ -24,7 +28,14 @@
             </button>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-            <a href="./login.html" class="text-sm font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
+            <?php 
+                if (isset($_SESSION['username']) && isset($_SESSION['user_id'])) : ?>
+                    <a href="dashboard.php" class="text-sm font-semibold leading-6 text-gray-900">Go to Dashboard <span aria-hidden="true">&rarr;</span></a>
+            <?php endif; ?>
+            <?php 
+                if (!isset($_SESSION['username']) && !isset($_SESSION['user_id'])) : ?>
+                    <a href="login.php" class="text-sm font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
+            <?php endif; ?>
         </div>
     </nav>
     <!-- Mobile menu, show/hide based on menu open state. -->
@@ -47,7 +58,7 @@
             <div class="mt-6 flow-root">
                 <div class="-my-6 divide-y divide-gray-500/10">
                     <div class="py-6">
-                        <a href="./login.html" class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Log in</a>
+                        
                     </div>
                 </div>
             </div>
@@ -72,7 +83,14 @@
                     <div class="pt-8 text-base font-semibold leading-7">
                         <p class="text-gray-900">Sounds interesting?</p>
                         <p>
-                            <a href="./login.html" class="text-sky-500 hover:text-sky-600">Let's start!</a>
+                            <?php 
+                                if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) : ?>
+                                <a href="dashboard.php" class="text-sky-500 hover:text-sky-600">Let's start!</a>
+                            <?php endif; ?>
+                            <?php 
+                                if (!isset($_SESSION['user_id']) && !isset($_SESSION['username'])) : ?>
+                                <a href="login.php" class="text-sky-500 hover:text-sky-600">Let's start!</a>
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
