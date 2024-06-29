@@ -172,7 +172,7 @@ $register->register();
                         <?php
                         $msg = $register->getHelpers()->flash('error');
                         if ($msg) : ?>
-                            <div class="mt-2 bg-teal-100 border border-teal-200 text-sm text-teal-800 rounded-lg p-4" role="alert">
+                            <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                 <span class="font-bold"><?= $msg; ?></span>
                             </div>
                         <?php endif; ?>
@@ -186,9 +186,9 @@ $register->register();
                             <?php
                             $nameErr = $register->getHelpers()->flash('name');
                             if ($nameErr) : ?>
-                                <div class="mt-2 bg-teal-100 border border-teal-200 text-sm text-teal-800 rounded-lg p-4" role="alert">
-                                    <span class="font-bold"><?= $nameErr; ?></span>
-                                </div>
+                                <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
+                                <span class="font-bold"><?= $nameErr; ?></span>
+                            </div>
                             <?php endif; ?>
                             <div>
                                 <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
@@ -199,7 +199,7 @@ $register->register();
                             <?php
                             $emailErr = $register->getHelpers()->flash('email');
                             if ($emailErr) : ?>
-                                <div class="mt-2 bg-teal-100 border border-teal-200 text-sm text-teal-800 rounded-lg p-4" role="alert">
+                                <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $emailErr; ?></span>
                                 </div>
                             <?php endif; ?>
@@ -214,7 +214,7 @@ $register->register();
                             <?php
                             $passErr = $register->getHelpers()->flash('password');
                             if ($passErr) : ?>
-                                <div class="mt-2 bg-teal-100 border border-teal-200 text-sm text-teal-800 rounded-lg p-4" role="alert">
+                                <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $passErr; ?></span>
                                 </div>
                             <?php endif; ?>
@@ -229,7 +229,7 @@ $register->register();
                             <?php
                             $confirmPass = $register->getHelpers()->flash('confirm_password');
                             if ($confirmPass) : ?>
-                                <div class="mt-2 bg-teal-100 border border-teal-200 text-sm text-teal-800 rounded-lg p-4" role="alert">
+                                <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $confirmPass; ?></span>
                                 </div>
                             <?php endif; ?>
@@ -240,7 +240,7 @@ $register->register();
 
                         <p class="mt-10 text-center text-sm text-gray-500">
                             Already have an account?
-                            <a href="./login.php" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Login!</a>
+                            <a href="login.php" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Login!</a>
                         </p>
                     </div>
                 </div>
