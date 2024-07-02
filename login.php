@@ -1,88 +1,10 @@
 <?php
 ob_start();
-session_start();//Start the Session
-require 'helpers.php';
-require 'file.php';
+session_start();
+require 'autoload.php';
 
-class Login{
-    protected $helpers;
-    protected $file;
-    // Error Bag
-    public $errors;
-    //Input Data
-    public $email;
-    protected $password;
-
-    public function __construct($file, $helpers, $password) {
-        $this->file     = $file;
-        $this->helpers  = $helpers;
-        $this->password = $password;
-    }
-
-    public function initErrors(){
-        return [];
-    }
-
-    public function getErrors(){
-        return $this->errors;
-    }
-
-    public function getHelpers(){
-        return $this->helpers;
-    }
-
-    public function login(){
-        //Initialize Error Bag
-        $this->errors = $this->initErrors();
-        // Check if the form is submitted
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Handle Any Errors That Occur
-            // Sanitize and Validate the Email Field
-            if (empty($_POST['email'])) {
-                $this->errors['email'] = 'Please provide an email address';
-                $this->helpers->flash('email',$this->errors['email']);
-            } else {
-                $this->email = $this->helpers->sanitize($_POST['email']);
-                if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-                    $this->errors['email'] = 'Please provide a valid email address';
-                    $this->helpers->flash('email',$this->errors['email']);
-                }
-            }
-            // Sanitize and Validate the Password Field
-            if (empty($_POST['password'])) {
-                $this->errors['password'] = 'Please provide a password';
-                $this->helpers->flash('error',$this->errors['password']);
-            } elseif (strlen($_POST['password']) < 8) {
-                $this->errors['password'] = 'Password must be at least 8 characters';
-                $this->helpers->flash('password',$this->errors['password']);
-            } else {
-                $this->password = $this->helpers->sanitize($_POST['password']);
-            }
-            if (empty($this->errors)) {
-                //Check whether the User exists in File
-                $filename = __DIR__.'/users.txt';
-                $user = $this->file->getUserByEmail($filename,$this->email);
-                if (!empty($user)) {
-                    // Verify the user & password
-                    if ($user && password_verify($this->password, $user['password'])) {
-                        $_SESSION['user_id'] = $user['id'];
-                        $_SESSION['username'] = $user['name'];
-                        header('Location: dashboard.php');
-                        exit;
-                    } else {
-                        $this->errors['auth_error'] = 'Invalid email or password';
-                        $this->helpers->flash('error',$this->errors['auth_error']);
-                    }
-                } else {
-                    $this->errors['auth_error'] = 'An error occurred. Please try again';
-                    $this->helpers->flash('error',$this->errors['auth_error']);
-                }
-            }
-        }
-    }
-}
-$login = new Login(new File(),new Helpers(),"");
-$login->login();
+$auth = new Auth("",new Helpers(),[],new User(new File(__DIR__."/files/users.txt")));
+$auth->login();
 ?>
 
 <!DOCTYPE html>
@@ -155,14 +77,14 @@ $login->login();
 
                     <div class="mt-10 mx-auto w-full max-w-xl">
                         <?php
-                        $message = $login->getHelpers()->flash('success');
+                        $message = $auth->getHelpers()->flash('success');
                         if ($message) : ?>
                             <div class="mt-2 bg-teal-100 border border-teal-200 text-sm text-teal-800 rounded-lg p-4" role="alert">
                                 <span class="font-bold"><?= $message; ?></span>
                             </div>
                         <?php endif; ?>
                         <?php 
-                        $msg = $login->getHelpers()->flash('error');
+                        $msg = $auth->getHelpers()->flash('error');
                         if ($msg) : ?>
                             <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                 <span class="font-bold"><?= $msg; ?></span>
@@ -176,7 +98,7 @@ $login->login();
                                 </div>
                             </div>
                             <?php 
-                            $emailErr = $login->getHelpers()->flash('email');
+                            $emailErr = $auth->getHelpers()->flash('email');
                             if ($emailErr) : ?>
                                 <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $emailErr; ?></span>
@@ -194,7 +116,7 @@ $login->login();
                                 </div>
                             </div>
                             <?php 
-                            $passwordErr = $login->getHelpers()->flash('password');
+                            $passwordErr = $auth->getHelpers()->flash('password');
                             if ($passwordErr) : ?>
                                 <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $passwordErr; ?></span>

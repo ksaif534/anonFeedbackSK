@@ -1,5 +1,7 @@
 <?php
-session_start();//Start the Session
+session_start();
+require 'autoload.php';
+$helpers = new Helpers();
 ?>
 
 <!DOCTYPE html>
@@ -29,11 +31,11 @@ session_start();//Start the Session
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
             <?php 
-                if (isset($_SESSION['username']) && isset($_SESSION['user_id'])) : ?>
+                if ($helpers->checkSession()) : ?>
                     <a href="dashboard.php" class="text-sm font-semibold leading-6 text-gray-900">Go to Dashboard <span aria-hidden="true">&rarr;</span></a>
             <?php endif; ?>
             <?php 
-                if (!isset($_SESSION['username']) && !isset($_SESSION['user_id'])) : ?>
+                if (!$helpers->checkSession()) : ?>
                     <a href="login.php" class="text-sm font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
             <?php endif; ?>
         </div>
@@ -84,11 +86,11 @@ session_start();//Start the Session
                         <p class="text-gray-900">Sounds interesting?</p>
                         <p>
                             <?php 
-                                if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) : ?>
+                                if ($helpers->checkSession()) : ?>
                                 <a href="dashboard.php" class="text-sky-500 hover:text-sky-600">Let's start!</a>
                             <?php endif; ?>
                             <?php 
-                                if (!isset($_SESSION['user_id']) && !isset($_SESSION['username'])) : ?>
+                                if (!$helpers->checkSession()) : ?>
                                 <a href="login.php" class="text-sky-500 hover:text-sky-600">Let's start!</a>
                             <?php endif; ?>
                         </p>

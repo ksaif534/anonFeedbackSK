@@ -1,62 +1,8 @@
 <?php
 
-require 'feedbackFile.php';
-require 'file.php';
-require 'helpers.php';
+require 'autoload.php';
 
-class Feedback{
-    //Input
-    public $feedback;
-    // Error Bag
-    protected $errors;
-    //Helpers
-    protected $helpers;
-    //FeedbackFile
-    protected $feedbackFile;
-
-    public function __construct($helpers, $errors , $feedbackFile){
-        $this->helpers      = $helpers;
-        $this->errors       = $errors;
-        $this->feedbackFile = $feedbackFile;
-    }
-
-    public function storeFeedback(){
-        //Store the link and feedback in file
-        //Input Data
-        $this->feedback = '';
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            //Get the Link from the hidden input field
-            $link = isset($_POST['link']) ? $_POST['link'] : '';
-            // Handle Any Errors That Occur
-            // Sanitize the Feedback Field
-            if(empty($_POST['feedback'])){
-                $this->errors['feedback'] = 'Please provide the feedback';
-            }else{
-                $this->feedback = $this->helpers->sanitize($_POST['feedback']);
-            }
-            //Store the Feedback
-            if (empty($this->errors)) {
-                //Prepare the Data
-                $feedback = [
-                    'link'      => $link,
-                    'feedback'  => $this->feedback
-                ];
-                //Store the Feedback in Feedbacks File
-                $feedbacks = $this->feedbackFile->getFeedbacks();
-                array_push($feedbacks,$feedback);
-                $filename = $this->feedbackFile->filename;
-                if ($this->feedbackFile->putProcessedFileContent($filename,$feedbacks)) {
-                    $this->helpers->flash('success', 'You have successfully stored the feedback');
-                    header('Location: feedback-success.php');
-                    exit;
-                }else{
-                    $this->errors['feedback_error'] = 'A feedback error occured. Please try again';
-                }
-            }
-        }
-    }
-}
-$fdback = new Feedback(new Helpers(),[],new FeedbackFile(new File()));
+$fdback = new Feedback(new File(__DIR__.'/files/feedbacks.txt'),[],new Helpers());
 $fdback->storeFeedback();
 ?>
 

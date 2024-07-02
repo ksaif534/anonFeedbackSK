@@ -1,46 +1,10 @@
 <?php
 session_start();
 
-require 'feedbackFile.php';
-require 'file.php';
+require 'autoload.php';
 
-class Dashboard{
-    protected $feedbackFile;
-    public $feedbacks;
-
-    public function __construct($feedbackFile){
-        $this->feedbackFile = $feedbackFile;
-        $this->feedbacks = $this->getAllFeedbacks();
-    }
-
-    public function getAllFeedbacks(){
-        return $this->feedbackFile->getFeedbacks();
-    }
-
-    public function checkLogin(){
-        // // Check if the user is not logged in
-        if (!isset($_SESSION['user_id']) && !isset($_SESSION['username'])) {
-            header("Location: login.php");
-            exit;
-        }
-    }
-
-    public function generateUniqueLink(){
-        $uniqueLink = bin2hex(random_bytes(16));
-        return $uniqueLink;
-    }
-
-    public function getCurrentDirUrl(){
-        $protocol       = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
-        $host           = $_SERVER['HTTP_HOST'];
-        $requestURI     = $_SERVER['REQUEST_URI'];
-        $dirURI         = dirname($requestURI);
-        $directoryUrl   = $protocol . '://' . $host . $dirURI . '/';
-        return $directoryUrl;
-    }
-}
-$dashboard = new Dashboard(new FeedbackFile(new File()));
-$dashboard->checkLogin();
+$dashboard  = new Dashboard(new File(__DIR__.'/files/feedbacks.txt'));
+$dashboard->checkAuth();
 ?>
 
 <!DOCTYPE html>
@@ -116,7 +80,7 @@ $dashboard->checkLogin();
             <h1 class="text-xl text-indigo-800 text-bold my-10">Received feedback</h1>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <?php 
-                    foreach ($dashboard->feedbacks as $feedback) {
+                    foreach ($dashboard->getFeedbacks() as $feedback) {
                         ?>
                             <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
                                 <div class="focus:outline-none">

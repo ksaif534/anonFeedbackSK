@@ -1,103 +1,8 @@
 <?php
-session_start();//Start Session
-require 'helpers.php';
-require 'file.php';
-
-class Register{
-    protected $helpers;
-    protected $file;
-    // Error Bag
-    protected $errors;
-    //Input Data
-    public $name;
-    public $email;
-    protected $password;
-
-    public function __construct($file,$helpers,$errors,$password){
-        $this->file             = $file;
-        $this->helpers          = $helpers;
-        $this->errors           = $errors;
-        $this->password         = $password;
-    }
-
-    public function getErrors(){
-        return $this->errors;
-    }
-
-    public function getHelpers(){
-        return $this->helpers;
-    }
-
-    public function register(){
-        // Input Data
-        $this->name = '';
-        $this->email = '';
-        // Check if the form is submitted
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Handle Any Errors That Occur
-            // Sanitize and Validate the Name Field
-            if (empty($_POST['name'])) {
-                $this->errors['name'] = 'Please provide a name';
-                $this->helpers->flash('name',$this->errors['name']);
-            } else {
-                $this->name = $this->helpers->sanitize($_POST['name']);
-            }
-            // Sanitize and Validate the Email Field
-            if (empty($_POST['email'])) {
-                $this->errors['email'] = 'Please provide an email address';
-                $this->helpers->flash('email',$this->errors['email']);
-            } else {
-                $this->email = $this->helpers->sanitize($_POST['email']);
-                if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-                    $this->errors['email'] = 'Please provide a valid email address';
-                    $this->helpers->flash('email',$this->errors['email']);
-                }
-            }
-            // Sanitize and Validate the Password Field
-            if (empty($_POST['password'])) {
-                $this->errors['password'] = 'Please provide a password';
-                $this->helpers->flash('password',$this->errors['password']);
-            } elseif (strlen($_POST['password']) < 8) {
-                $this->errors['password'] = 'Password must be at least 8 characters';
-                $this->helpers->flash('password',$this->errors['password']);
-            } else {
-                //Check if the raw password mathces the confirm password
-                if (($_POST['password']) !== $_POST['confirm_password']) {
-                    $this->errors['confirm_password'] = 'Password and Confirm Password do not match';
-                    $this->helpers->flash('confirm_password',$this->errors['confirm_password']);
-                }
-                $this->password = $this->helpers->sanitize($_POST['password']);
-                // Hash The Password
-                $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-            }
-            if (empty($this->errors)) {
-                //Store Registration Data in File
-                //Prepare the User Record
-                $user = [
-                    'name'              => $this->name,
-                    'email'             => $this->email,
-                    'password'          => $this->password
-                ];
-                //Update with Auto Increment
-                $user = $this->file->updatedFileInputWithAutoIncrement($this->file->getUsers(),$user);
-                //Store the User in Users File
-                $users = $this->file->getUsers();
-                array_push($users,$user);
-                $filename = $this->file->initFileName();
-                if ($this->file->putProcessedFileContent($filename,$users)) {
-                    $this->helpers->flash('success', 'You have successfully registered. Please log in to continue');
-                    header('Location: login.php');
-                    exit;
-                } else {
-                    $this->errors['auth_error'] = 'An error occurred. Please try again';
-                    $this->helpers->flash('error',$this->errors['auth_error']);
-                }
-            }
-        }
-    }
-}
-$register = new Register(new File(),new Helpers(),[],"");
-$register->register();
+session_start();
+require 'autoload.php';
+$auth = new Auth("",new Helpers(),[],new User(new File(__DIR__."/files/users.txt")));
+$auth->register();
 ?>
 
 <!DOCTYPE html>
@@ -170,7 +75,7 @@ $register->register();
 
                     <div class="mt-10 mx-auto w-full max-w-xl">
                         <?php
-                        $msg = $register->getHelpers()->flash('error');
+                        $msg = $auth->getHelpers()->flash('error');
                         if ($msg) : ?>
                             <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                 <span class="font-bold"><?= $msg; ?></span>
@@ -184,7 +89,7 @@ $register->register();
                                 </div>
                             </div>
                             <?php
-                            $nameErr = $register->getHelpers()->flash('name');
+                            $nameErr = $auth->getHelpers()->flash('name');
                             if ($nameErr) : ?>
                                 <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                 <span class="font-bold"><?= $nameErr; ?></span>
@@ -197,7 +102,7 @@ $register->register();
                                 </div>
                             </div>
                             <?php
-                            $emailErr = $register->getHelpers()->flash('email');
+                            $emailErr = $auth->getHelpers()->flash('email');
                             if ($emailErr) : ?>
                                 <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $emailErr; ?></span>
@@ -212,7 +117,7 @@ $register->register();
                                 </div>
                             </div>
                             <?php
-                            $passErr = $register->getHelpers()->flash('password');
+                            $passErr = $auth->getHelpers()->flash('password');
                             if ($passErr) : ?>
                                 <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $passErr; ?></span>
@@ -227,7 +132,7 @@ $register->register();
                                 </div>
                             </div>
                             <?php
-                            $confirmPass = $register->getHelpers()->flash('confirm_password');
+                            $confirmPass = $auth->getHelpers()->flash('confirm_password');
                             if ($confirmPass) : ?>
                                 <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
                                     <span class="font-bold"><?= $confirmPass; ?></span>
